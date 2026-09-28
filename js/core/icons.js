@@ -1,13 +1,22 @@
 /**
- * BunkWise - Pixel Art Icons (Crisp, 8-Bit Retro Pixel SVGs)
- * No emojis. Pure pixel-art geometry rendered with sharp edges.
+ * BunkWise - Pixel Art Icons (Crisp 8-Bit Retro Pixel SVGs)
+ * Clean, sharp, pixelated geometry. Zero emoji dependencies.
  */
 
 const PixelIcon = {
-  // Collection of pixelated SVG paths rendered on crisp 16x16 or 24x24 grids
   icons: {
     cat: `<svg class="px-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h3v2H2V2zm9 0h3v2h-3V2zM1 4h2v2H1V4zm12 0h2v2h-2V4zM2 6h12v6H2V6zm2 2h2v2H4V8zm6 0h2v2h-2V8zm-3 2h2v1H7v-1zm-4 2h10v2H3v-2z"/></svg>`,
     
+    skull: `<svg class="px-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4 1h8v2H4V1zm-2 2h12v5H2V3zm0 5h3v2H2V8zm9 0h3v2h-3V8zM4 10h8v2H4v-2zm1 2h2v2H5v-2zm4 0h2v2H9v-2zm-5-6h2v2H4V6zm6 0h2v2h-2V6z"/></svg>`,
+    
+    coffee: `<svg class="px-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h9v8c0 2-1 3-3 3H5c-2 0-3-1-3-3V3zm9 2h2c1 0 2 1 2 2v2c0 1-1 2-2 2h-2V5zm0 2v2h2V7h-2zM4 1h1v1H4V1zm3 0h1v1H7V1zm3 0h1v1h-1V1z"/></svg>`,
+    
+    bed: `<svg class="px-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1 5h2v6H1V5zm2 3h10v3H3V8zm10-3h2v6h-2V5zM3 6h3v2H3V6zM1 12h2v2H1v-2zm12 0h2v2h-2v-2z"/></svg>`,
+    
+    fire: `<svg class="px-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M7 1h2v3H7V1zm-2 3h2v3H5V4zm6 0h2v4h-2V4zM3 7h2v4H3V7zm10 1h2v4h-2V8zM5 11h6v3H5v-3zm2-3h2v3H7V8z"/></svg>`,
+
+    dice: `<svg class="px-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h12v12H2V2zm2 2v2h2V4H4zm6 0v2h2V4h-2zm-3 3v2h2V7H7zm-3 3v2h2v-2H4zm6 0v2h2v-2h-2z"/></svg>`,
+
     dashboard: `<svg class="px-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1 2h6v5H1V2zm8 0h6v3H9V2zm0 5h6v7H9V7zM1 9h6v5H1V9z"/></svg>`,
     
     calendar: `<svg class="px-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M3 1h2v2H3V1zm8 0h2v2h-2V1zM1 3h14v12H1V3zm2 4h3v2H3V7zm5 0h3v2H8V7zm-5 4h3v2H3v-2zm5 0h3v2H8v-2z"/></svg>`,
@@ -38,15 +47,11 @@ const PixelIcon = {
     
     refresh: `<svg class="px-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h4v2H3v3H1V3h1V2zm11 0h2v5h-2V4h-3V2h3zm1 12h-4v-2h3v-3h2v4h-1v1zM3 14H1v-5h2v3h3v2H3z"/></svg>`,
     
-    clock: `<svg class="px-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M7 1h2v2H7V1zm-4 2h2v2H3V3zm8 0h2v2h-2V3zM1 7h2v2H1V7zm12 0h2v2h-2V7zM3 11h2v2H3v-2zm8 0h2v2h-2v-2zM7 13h2v2H7v-2zM7 4h2v4h3v2H7V4z"/></svg>`,
-
-    zap: `<svg class="px-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1L2 9h5v6l6-8H8V1z"/></svg>`,
-
-    shield: `<svg class="px-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2 1h12v7c0 4-3 7-6 8-3-1-6-4-6-8V1zm2 2v5c0 3 2 5 4 6 2-1 4-3 4-6V3H4z"/></svg>`
+    clock: `<svg class="px-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M7 1h2v2H7V1zm-4 2h2v2H3V3zm8 0h2v2h-2V3zM1 7h2v2H1V7zm12 0h2v2h-2V7zM3 11h2v2H3v-2zm8 0h2v2h-2v-2zM7 13h2v2H7v-2zM7 4h2v4h3v2H7V4z"/></svg>`
   },
 
   get(name, extraClass = "") {
-    const svg = this.icons[name] || this.icons.info;
+    const svg = this.icons[name] || this.icons.alert;
     if (!extraClass) return svg;
     return svg.replace('class="px-icon"', `class="px-icon ${extraClass}"`);
   }

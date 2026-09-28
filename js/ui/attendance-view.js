@@ -1,5 +1,5 @@
 /**
- * BunkWise - Clean Attendance Matrix View
+ * BunkWise - Clean Attendance Matrix View with College Humor
  */
 
 const AttendanceView = {
@@ -16,7 +16,7 @@ const AttendanceView = {
           <div>
             <h2 class="font-headline text-2xl font-bold text-[#18181B]">Attendance Matrix</h2>
             <p class="text-xs text-slate-500 mt-0.5">
-              Subject tallies, skip allowances, and consecutive recovery targets.
+              Subject-wise tallies, skip allowances, and redemption streaks.
             </p>
           </div>
 
@@ -36,26 +36,35 @@ const AttendanceView = {
               </span>
               <span class="text-[11px] text-slate-500">Target: ${target}%</span>
             </div>
+            <span class="text-[10px] text-slate-400 block mt-0.5">
+              ${overall.percentage >= target ? 'Comfortably above cutoff' : 'Living on prayers & proxy attempts'}
+            </span>
           </div>
 
           <div class="bw-card p-3.5 bg-white">
-            <span class="text-[10px] uppercase font-bold text-slate-400 block">Subjects in Deficit</span>
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Subjects in Danger</span>
             <div class="flex items-baseline gap-2 mt-1">
               <span class="font-headline text-2xl font-black text-red-600">
                 ${overall.belowTargetCount}
               </span>
               <span class="text-[11px] text-slate-500">below ${target}% requirement</span>
             </div>
+            <span class="text-[10px] text-red-600 font-bold block mt-0.5">
+              ${overall.belowTargetCount > 0 ? 'Urgent attention required' : 'Clean sheet!'}
+            </span>
           </div>
 
           <div class="bw-card p-3.5 bg-white">
-            <span class="text-[10px] uppercase font-bold text-slate-400 block">Total University Classes</span>
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Lectures Endured</span>
             <div class="flex items-baseline gap-2 mt-1">
               <span class="font-headline text-2xl font-black text-slate-800">
                 ${overall.totalAttended} / ${overall.totalConducted}
               </span>
               <span class="text-[11px] text-slate-500">attended</span>
             </div>
+            <span class="text-[10px] text-slate-400 block mt-0.5">
+              100% attendance is a myth
+            </span>
           </div>
         </div>
 
@@ -78,37 +87,42 @@ const AttendanceView = {
     let statusTheme = {
       badge: "CRITICAL",
       badgeClass: "bw-badge-danger",
-      pctColor: "text-red-600"
+      pctColor: "text-red-600",
+      humorNote: "Redemption arc needed ASAP"
     };
 
     if (conducted === 0) {
       statusTheme = {
         badge: "NOT STARTED",
         badgeClass: "bg-slate-100 text-slate-600 border-slate-300",
-        pctColor: "text-slate-400"
+        pctColor: "text-slate-400",
+        humorNote: "Technically unblemished"
       };
     } else if (pct >= 80) {
       statusTheme = {
-        badge: "COMFORTABLE",
+        badge: "ACADEMIC WEAPON",
         badgeClass: "bw-badge-safe",
-        pctColor: "text-emerald-700"
+        pctColor: "text-emerald-700",
+        humorNote: "Cushion intact, go touch grass"
       };
     } else if (pct >= target) {
       statusTheme = {
-        badge: "SAFE",
+        badge: "SAFE HAVEN",
         badgeClass: "bw-badge-safe",
-        pctColor: "text-emerald-600"
+        pctColor: "text-emerald-600",
+        humorNote: "Safe, but don't get cocky"
       };
     } else if (pct >= 70) {
       statusTheme = {
-        badge: "BORDERLINE",
+        badge: "RAZOR BLADE",
         badgeClass: "bw-badge-warn",
-        pctColor: "text-amber-600"
+        pctColor: "text-amber-600",
+        humorNote: "One bad cold away from debarment"
       };
     }
 
     return `
-      <div class="bw-card p-4 bg-white flex flex-col justify-between gap-3">
+      <div class="bw-card p-4 bg-white flex flex-col justify-between gap-3 border-2 hover:border-[#18181B] transition-all">
         <!-- Subject Info -->
         <div>
           <div class="flex items-center justify-between gap-2 mb-1">
@@ -146,11 +160,16 @@ const AttendanceView = {
               <span class="text-[10px] uppercase font-bold text-emerald-800 block">Skip Allowance</span>
               <strong class="text-emerald-700">${skips} safe ${skips === 1 ? 'class' : 'classes'}</strong>
             ` : `
-              <span class="text-[10px] uppercase font-bold text-red-800 block">Recovery Needed</span>
+              <span class="text-[10px] uppercase font-bold text-red-800 block">Redemption Goal</span>
               <strong class="text-red-600">+${recovery} consecutive</strong>
             `}
           </div>
         </div>
+
+        <!-- Humor Reality Subtitle -->
+        <p class="text-[11px] text-slate-500 italic">
+          “${statusTheme.humorNote}”
+        </p>
 
         <!-- Steppers -->
         <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-xs">

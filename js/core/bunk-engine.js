@@ -1,6 +1,6 @@
 /**
- * BunkWise - Deterministic Attendance Math Engine
- * Zero AI hallucination. Pure deterministic algebra.
+ * BunkWise - Deterministic Attendance Math Engine with Real College Humor
+ * Zero AI hallucination. Pure deterministic algebra + sharp student humor.
  */
 
 const BunkEngine = {
@@ -13,7 +13,6 @@ const BunkEngine = {
     if (!conducted || conducted <= 0) return 0;
     const targetDecimal = target / 100;
     
-    // If already below target, zero skips allowed
     if ((attended / conducted) < targetDecimal) {
       return 0;
     }
@@ -49,6 +48,57 @@ const BunkEngine = {
     };
   },
 
+  /**
+   * Generates humorous, subject-aware reality checks for students.
+   */
+  getSubjectHumor(code, currentPct, target, isSafe) {
+    const c = (code || "").toUpperCase();
+
+    if (currentPct === 0) {
+      return "Zero lectures held yet. Show up once and you are legally a 100% attendance god.";
+    }
+
+    if (c.includes("3201")) {
+      return currentPct < target 
+        ? "Absolute academic treason. Sit in the front row, nod at tensors, and cry quietly."
+        : "Safe for now, but Deep Learning will humble you fast. Guard your cushion.";
+    }
+
+    if (c.includes("3202")) {
+      return currentPct < target
+        ? "Prompting ChatGPT won't write you out of this attendance hole. Go to class."
+        : "Cushion intact. You may prompt from bed today if you wish.";
+    }
+
+    if (c.includes("3203A") && c.includes("LAB")) {
+      return currentPct <= target
+        ? "Walking the razor blade. One single bunk and you kiss your exam hall ticket goodbye."
+        : "Lab attendance is alive. Don't blow it on a 15-minute nap.";
+    }
+
+    if (c.includes("3203A")) {
+      return currentPct < target
+        ? "Computational Data is computing your demise. Needs unbroken streak."
+        : "Calculated cushion available. Stay frosty.";
+    }
+
+    if (c.includes("DSC04") || c.includes("DSC05")) {
+      return isSafe
+        ? "You have a legal bunk token. Go get boba, you academic weapon."
+        : "Coursera track needs love. Don't let an online cert sink your semester.";
+    }
+
+    if (c.includes("3205")) {
+      return "Design Thinking: Think about designing an alarm clock that actually wakes you up.";
+    }
+
+    if (isSafe) {
+      return "Safe to skip. Go sleep in or grab a chai, you have calculated room to breathe.";
+    }
+
+    return "Skipping drops you straight into the Dean's automated stern email list. Do not do it.";
+  },
+
   evaluateClassDecision(subject, target = 75) {
     if (!subject) {
       return {
@@ -57,6 +107,7 @@ const BunkEngine = {
         badgeClass: "bw-badge-warn",
         title: "No Data",
         message: "Subject data not found.",
+        realityCheck: "Who knows? Roll the dice.",
         safeToSkip: false
       };
     }
@@ -71,6 +122,7 @@ const BunkEngine = {
         badgeClass: "bg-slate-100 text-slate-700 border-slate-300",
         title: "Course Not Started",
         message: "No lectures conducted yet.",
+        realityCheck: this.getSubjectHumor(subject.code, 0, target, false),
         currentPct: 0,
         attendPct: 100,
         skipPct: 0,
@@ -90,10 +142,11 @@ const BunkEngine = {
     if (currentPct < target) {
       return {
         status: "BELOW_TARGET",
-        badge: "CRITICAL",
+        badge: "DO NOT BUNK",
         badgeClass: "bw-badge-danger",
-        title: "DO NOT SKIP",
-        message: `Currently below ${target}%. Skipping drops you to ${ifSkip.percentage}%.`,
+        title: "CRITICAL DEFICIT",
+        message: `Currently ${currentPct}% (< ${target}%). Skipping drops you to ${ifSkip.percentage}%.`,
+        realityCheck: this.getSubjectHumor(subject.code, currentPct, target, false),
         recoveryText: `Need ${recoveryNeeded} consecutive attendances`,
         currentPct,
         attendPct: ifAttend.percentage,
@@ -110,10 +163,11 @@ const BunkEngine = {
     if (ifSkip.percentage < target) {
       return {
         status: "BORDERLINE",
-        badge: "BORDERLINE",
+        badge: "RAZOR BLADE",
         badgeClass: "bw-badge-warn",
-        title: "DON'T SKIP",
-        message: `Skipping drops attendance to ${ifSkip.percentage}% (below ${target}%).`,
+        title: "DON'T BUNK",
+        message: `Skipping drops attendance to ${ifSkip.percentage}% (breaches ${target}% cutoff).`,
+        realityCheck: this.getSubjectHumor(subject.code, currentPct, target, false),
         recoveryText: "Must attend to stay safe",
         currentPct,
         attendPct: ifAttend.percentage,
@@ -129,10 +183,11 @@ const BunkEngine = {
     // Scenario C: Safe to skip
     return {
       status: "SAFE_TO_SKIP",
-      badge: "SAFE TO SKIP",
+      badge: "SAFE TO BUNK",
       badgeClass: "bw-badge-safe",
-      title: "SAFE TO SKIP",
-      message: `Skipping leaves you at ${ifSkip.percentage}% (remains ≥ ${target}%).`,
+      title: "CUSHION AVAILABLE",
+      message: `Skipping leaves you at ${ifSkip.percentage}% (comfortably ≥ ${target}%).`,
+      realityCheck: this.getSubjectHumor(subject.code, currentPct, target, true),
       recoveryText: `${skipAllowance} safe skip(s) available`,
       currentPct,
       attendPct: ifAttend.percentage,
