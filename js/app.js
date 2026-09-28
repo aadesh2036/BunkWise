@@ -7,20 +7,12 @@ const App = {
   state: null,
 
   init() {
-    // 1. Initialize persistent state from LocalStorage or seed with student demo data
     this.state = StorageManager.init();
-
-    // 2. Setup navigation listeners
     this.setupNavigation();
-
-    // 3. Render current tab view
     this.renderCurrentView();
-
-    console.log("⚡ BunkWise v1.0 initialized successfully. State:", this.state);
   },
 
   setupNavigation() {
-    // Desktop Nav tabs
     document.querySelectorAll("[data-nav-tab]").forEach(btn => {
       btn.addEventListener("click", (e) => {
         e.preventDefault();
@@ -29,7 +21,6 @@ const App = {
       });
     });
 
-    // Mobile bottom tabs
     document.querySelectorAll("[data-mobile-tab]").forEach(btn => {
       btn.addEventListener("click", (e) => {
         e.preventDefault();
@@ -47,7 +38,6 @@ const App = {
   },
 
   updateNavUI() {
-    // Update desktop tabs
     document.querySelectorAll("[data-nav-tab]").forEach(btn => {
       const tab = btn.getAttribute("data-nav-tab");
       if (tab === this.currentTab) {
@@ -57,7 +47,6 @@ const App = {
       }
     });
 
-    // Update mobile bottom tabs
     document.querySelectorAll("[data-mobile-tab]").forEach(btn => {
       const tab = btn.getAttribute("data-mobile-tab");
       if (tab === this.currentTab) {
@@ -67,7 +56,6 @@ const App = {
       }
     });
 
-    // Update header live pulse badge
     this.updateHeaderBadge();
   },
 
@@ -78,28 +66,20 @@ const App = {
     const target = this.state.settings.targetAttendance || 75;
     const overall = BunkEngine.calculateOverallStats(this.state.subjects, target);
 
-    let vibeText = "Panic Mode 🙀";
-    let bgClass = "bg-[#FEECEE]";
-    let textClass = "text-error";
+    let vibeText = "Below Cutoff";
+    let bgClass = "bg-[#FEF2F2]";
+    let textClass = "text-red-700";
 
-    if (overall.percentage >= 80) {
-      vibeText = "Cruising 😼";
-      bgClass = "bg-[#E8F8F2]";
-      textClass = "text-emerald-700";
-    } else if (overall.percentage >= target) {
-      vibeText = "Safe Zone 🛡️";
-      bgClass = "bg-[#E8F8F2]";
-      textClass = "text-emerald-700";
-    } else if (overall.percentage >= target - 5) {
-      vibeText = "Sweating 😰";
-      bgClass = "bg-[#FFFBEA]";
-      textClass = "text-amber-700";
+    if (overall.percentage >= target) {
+      vibeText = "Above Cutoff";
+      bgClass = "bg-[#F0FDF4]";
+      textClass = "text-emerald-800";
     }
 
-    badgeEl.className = `hidden sm:flex items-center gap-1.5 px-2.5 py-1 ${bgClass} border-2 border-[#18181B] rounded shadow-[2px_2px_0px_#18181B]`;
+    badgeEl.className = `hidden sm:flex items-center gap-2 px-2.5 py-1 ${bgClass} border border-slate-300 rounded shadow-[1px_1px_0px_#18181B]`;
     badgeEl.innerHTML = `
-      <span class="w-2 h-2 rounded-full ${overall.percentage >= target ? 'bg-emerald-600' : 'bg-red-600 animate-pulse'}"></span>
-      <span class="font-label-code text-xs font-bold ${textClass} tracking-tight">Attendance: ${overall.percentage}% (${vibeText})</span>
+      <span class="w-2 h-2 rounded-full ${overall.percentage >= target ? 'bg-emerald-600' : 'bg-red-600'}"></span>
+      <span class="text-xs font-bold ${textClass} tracking-tight">Attendance: ${overall.percentage}% (${vibeText})</span>
     `;
   },
 
@@ -133,15 +113,14 @@ const App = {
   undoLastAction() {
     const result = StorageManager.undoLastHistoryEntry(this.state.subjects);
     if (result) {
-      const sub = result.updatedSubject;
-      this.showToast(`↩️ Reverted last attendance log for <strong>${result.revertedEntry.subjectCode}</strong>.`);
+      this.showToast(`Reverted attendance log for ${result.revertedEntry.subjectCode}.`);
       this.renderCurrentView();
     } else {
       this.showToast("No recent actions to undo.");
     }
   },
 
-  showToast(message, duration = 3500) {
+  showToast(message, duration = 3000) {
     let toast = document.getElementById("global-toast");
     if (!toast) {
       toast = document.createElement("div");
@@ -164,7 +143,7 @@ const App = {
   }
 };
 
-// Bootstrap on window load
+// Bootstrap
 document.addEventListener("DOMContentLoaded", () => {
   App.init();
 });

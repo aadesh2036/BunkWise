@@ -4,16 +4,15 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BunkWise — Know your attendance. Know your freedom.</title>
-  <meta name="description" content="College student attendance & timetable decision engine. Calculate exactly which upcoming classes you can safely miss without falling below your 75% target."/>
+  <meta name="description" content="Student attendance and timetable planning engine. Calculate exactly which upcoming classes you can safely miss without falling below your 75% target."/>
   
-  <!-- Favicon Emoji -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22 width=%22100%22 height=%22100%22><text y=%22.9em%22 font-size=%2290%22>😼</text></svg>">
+  <!-- Pixel Cat Favicon SVG -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22 fill=%22%2318181B%22><path d=%22M2 2h3v2H2V2zm9 0h3v2h-3V2zM1 4h2v2H1V4zm12 0h2v2h-2V4zM2 6h12v6H2V6zm2 2h2v2H4V8zm6 0h2v2h-2V8zm-3 2h2v1H7v-1zm-4 2h10v2H3v-2z%22/></svg>">
 
-  <!-- Typography & Material Symbols Icons -->
+  <!-- Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -23,16 +22,12 @@
       theme: {
         extend: {
           colors: {
-            "surface": "#F9F9F6",
-            "surface-container": "#EEEEEB",
-            "surface-container-high": "#E8E8E5",
-            "surface-container-lowest": "#FFFFFF",
+            "surface": "#F7F7F5",
             "on-surface": "#18181B",
-            "primary": "#10B981",
+            "primary": "#0F766E",
             "primary-container": "#A7F3D0",
             "on-primary-container": "#064E3B",
-            "error": "#EF4444",
-            "tertiary": "#F59E0B"
+            "error": "#DC2626"
           },
           fontFamily: {
             "headline": ["Hanken Grotesk", "sans-serif"],
@@ -49,112 +44,108 @@
 
 <body class="bg-surface font-mono text-on-surface antialiased min-h-screen flex flex-col pb-20 md:pb-0">
 
-  <!-- Top Sticky Navigation Bar -->
-  <header class="fixed top-0 left-0 w-full z-50 bg-white border-b-2 border-[#18181B] shadow-[0_3px_0px_#18181B]">
-    <div class="h-16 max-w-6xl mx-auto px-4 flex items-center justify-between gap-4">
+  <!-- Top Navigation Header -->
+  <header class="fixed top-0 left-0 w-full z-50 bg-white border-b-2 border-[#18181B] shadow-[0_2px_0px_#18181B]">
+    <div class="h-14 max-w-5xl mx-auto px-4 flex items-center justify-between gap-4">
       
-      <!-- Brand Logo & Badge -->
-      <a href="#" onclick="App.navigateTo('dashboard'); return false;" class="flex items-center gap-2.5 select-none">
-        <span class="text-2xl">😼</span>
-        <div class="flex flex-col">
-          <div class="flex items-center gap-1.5">
-            <span class="font-headline text-xl font-bold tracking-tight text-[#18181B]">BunkWise</span>
-            <span class="px-1.5 py-0.2 bg-emerald-100 text-emerald-900 text-[10px] font-bold border border-[#18181B] rounded shadow-[1px_1px_0px_#18181B]">Codédex</span>
-          </div>
-          <span class="text-[9px] text-slate-500 font-bold hidden sm:inline">Know your attendance. Know your freedom.</span>
+      <!-- Brand Logo -->
+      <a href="#" onclick="App.navigateTo('dashboard'); return false;" class="flex items-center gap-2 select-none">
+        <span class="w-6 h-6 flex items-center justify-center bg-slate-100 border border-[#18181B] rounded text-slate-900" id="header-logo-icon"></span>
+        <div class="flex items-center gap-1.5">
+          <span class="font-headline text-lg font-bold tracking-tight text-[#18181B]">BunkWise</span>
+          <span class="px-1.5 py-0.2 bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-300 rounded">v1.0</span>
         </div>
       </a>
 
       <!-- Desktop Nav Tabs -->
-      <nav class="hidden lg:flex items-center gap-1">
+      <nav class="hidden md:flex items-center gap-1">
         <button data-nav-tab="dashboard" class="nav-tab-btn active">
-          <span>⚡</span>
+          <span class="px-tab-icon" data-icon="dashboard"></span>
           <span>Dashboard</span>
         </button>
         <button data-nav-tab="timetable" class="nav-tab-btn">
-          <span>📅</span>
-          <span>Timetable & OCR</span>
+          <span class="px-tab-icon" data-icon="calendar"></span>
+          <span>Timetable</span>
         </button>
         <button data-nav-tab="attendance" class="nav-tab-btn">
-          <span>📊</span>
-          <span>Attendance Matrix</span>
+          <span class="px-tab-icon" data-icon="chart"></span>
+          <span>Attendance</span>
         </button>
         <button data-nav-tab="planner" class="nav-tab-btn">
-          <span>🧮</span>
-          <span>Bunk Planner</span>
+          <span class="px-tab-icon" data-icon="planner"></span>
+          <span>Planner</span>
         </button>
         <button data-nav-tab="settings" class="nav-tab-btn">
-          <span>⚙️</span>
-          <span>Settings / Vault</span>
+          <span class="px-tab-icon" data-icon="settings"></span>
+          <span>Vault</span>
         </button>
       </nav>
 
-      <!-- Right Side Live Attendance Pulse Pill -->
+      <!-- Right Side Standing Pill -->
       <div class="flex items-center gap-2">
-        <div id="header-pulse-badge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-[#FEECEE] border-2 border-[#18181B] rounded shadow-[2px_2px_0px_#18181B]">
-          <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-          <span class="text-xs font-bold text-red-600 tracking-tight">Attendance: 64.96% (Panic Mode 🙀)</span>
+        <div id="header-pulse-badge" class="hidden sm:flex items-center gap-1.5 px-2 py-0.5 bg-red-50 border border-slate-300 rounded text-xs font-bold text-red-700">
+          <span class="w-2 h-2 rounded-full bg-red-600"></span>
+          <span>64.96% (Below 75%)</span>
         </div>
 
-        <button onclick="App.navigateTo('settings')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center border-2 border-[#18181B] shadow-[2px_2px_0px_#18181B]" title="Settings">
-          <span class="material-symbols-outlined text-[18px]">settings</span>
+        <button onclick="App.navigateTo('settings')" class="w-8 h-8 rounded bg-slate-50 hover:bg-slate-100 flex items-center justify-center border border-slate-300" title="Settings">
+          <span class="px-btn-icon" data-icon="settings"></span>
         </button>
       </div>
 
     </div>
   </header>
 
-  <!-- Main View Container -->
-  <main class="w-full pt-20 px-4 flex-1">
+  <!-- Main View Area -->
+  <main class="w-full pt-18 mt-14 px-4 flex-1">
     <div id="app-main-content">
-      <!-- Views dynamically injected here via Vanilla JS router -->
+      <!-- Views dynamically rendered here via Vanilla JS -->
     </div>
   </main>
 
-  <!-- Mobile Bottom Sticky Navigation Bar -->
-  <nav class="lg:hidden fixed bottom-0 left-0 w-full bg-white border-t-2 border-[#18181B] shadow-[0_-3px_0px_#18181B] z-40 flex items-center justify-around px-1 py-1">
+  <!-- Mobile Bottom Sticky Navigation -->
+  <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t-2 border-[#18181B] z-40 flex items-center justify-around px-1 py-1">
     <button data-mobile-tab="dashboard" class="mobile-nav-btn active">
-      <span class="material-symbols-outlined text-[20px]">speed</span>
+      <span class="px-tab-icon" data-icon="dashboard"></span>
       <span>Dashboard</span>
     </button>
     <button data-mobile-tab="timetable" class="mobile-nav-btn">
-      <span class="material-symbols-outlined text-[20px]">calendar_today</span>
+      <span class="px-tab-icon" data-icon="calendar"></span>
       <span>Timetable</span>
     </button>
     <button data-mobile-tab="attendance" class="mobile-nav-btn">
-      <span class="material-symbols-outlined text-[20px]">donut_large</span>
+      <span class="px-tab-icon" data-icon="chart"></span>
       <span>Attendance</span>
     </button>
     <button data-mobile-tab="planner" class="mobile-nav-btn">
-      <span class="material-symbols-outlined text-[20px]">calculate</span>
+      <span class="px-tab-icon" data-icon="planner"></span>
       <span>Planner</span>
     </button>
     <button data-mobile-tab="settings" class="mobile-nav-btn">
-      <span class="material-symbols-outlined text-[20px]">settings</span>
+      <span class="px-tab-icon" data-icon="settings"></span>
       <span>Vault</span>
     </button>
   </nav>
 
   <!-- Footer -->
-  <footer class="w-full bg-white border-t-2 border-[#18181B] py-6 mt-12">
-    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-      <div class="flex items-center gap-2">
-        <span class="font-headline font-bold text-sm text-[#18181B]">BunkWise</span>
-        <span class="text-slate-500">• Know your attendance. Know your freedom.</span>
+  <footer class="w-full bg-white border-t border-slate-200 py-5 mt-10">
+    <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div class="flex items-center gap-1.5">
+        <strong class="text-slate-800">BunkWise</strong>
+        <span>• Know your attendance. Know your freedom.</span>
       </div>
-      <div class="flex items-center gap-3 text-slate-600">
-        <span>Codédex Hackathon Edition</span>
+      <div class="flex items-center gap-3">
+        <span>Deterministic Math Engine</span>
         <span>•</span>
-        <span class="text-emerald-700 font-bold">100% Client-Side Privacy</span>
-        <span>•</span>
-        <button onclick="SettingsView.resetToStudentDemo()" class="underline font-bold text-[#18181B]">
-          Reset Demo
+        <button onclick="SettingsView.resetToStudentDemo()" class="underline font-bold text-slate-700">
+          Reset Demo Data
         </button>
       </div>
     </div>
   </footer>
 
-  <!-- Scripts in dependency order (Zero Node/Build tools required!) -->
+  <!-- Scripts in dependency order -->
+  <script src="js/core/icons.js"></script>
   <script src="js/data/demo-data.js"></script>
   <script src="js/core/bunk-engine.js"></script>
   <script src="js/core/storage.js"></script>
@@ -167,6 +158,23 @@
   <script src="js/ui/planner-view.js"></script>
   <script src="js/ui/settings-view.js"></script>
   <script src="js/app.js"></script>
+
+  <!-- Hydrate pixel icons in static HTML elements -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const logoIcon = document.getElementById("header-logo-icon");
+      if (logoIcon && window.PixelIcon) {
+        logoIcon.innerHTML = PixelIcon.get('cat');
+      }
+
+      document.querySelectorAll("[data-icon]").forEach(el => {
+        const iconName = el.getAttribute("data-icon");
+        if (window.PixelIcon && PixelIcon.icons[iconName]) {
+          el.innerHTML = PixelIcon.get(iconName);
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>

@@ -1,44 +1,47 @@
-# 😼 BunkWise — Know your attendance. Know your freedom.
+# BunkWise — Know your attendance. Know your freedom.
 
 > **Codédex Hackathon Project**  
-> *An attendance decision engine built around a college student's real-life timetable.*
+> *A minimalist attendance decision engine built around a student's real-life timetable.*
 
 ---
 
-## 📌 Elevator Pitch
+## Pitch
 
 College attendance portals tell students numbers like `15/31 — 48.39%`.  
 What students actually need answered is:
 
-> **“Can I skip today's 1:00 PM lecture without getting debarred from exams?”**
+> **“Can I skip today's 1:00 PM lecture without falling below the 75% cutoff?”**
 
 **BunkWise** turns a student's timetable and attendance records into an immediate daily decision engine. It tells students exactly how missing upcoming classes affects their attendance percentage, calculates how many classes can be safely skipped, and provides the exact streak of consecutive classes required to recover to the 75% cutoff.
 
+AI is kept strictly where it provides genuine value: **reading timetable photos through OCR**. Everything else is fast, explainable, deterministic mathematics.
+
 ---
 
-## 📸 Key Features
+## Clean & Focused Features
 
-1. **⚡ Actionable Daily Dashboard**
-   - Instant calculation for today's classes: **SAFE TO BUNK (🟢)**, **WALKING THE WIRE (⚠️)**, or **DO NOT BUNK (🔴)**.
-   - Shows deterministic projections: *“Attend ➔ 67.86% (+1.19%) | Bunk ➔ 64.29% (-2.38%)”*.
-   - 1-Tap Attendance logging (*“I Showed Up 🫡”* / *“I Slept In 💀”*) with instant undo support.
-   - Interactive **BunkCat** mascot with dynamic moods (*Academic Weapon*, *Sweating Bullets*, *Full Meltdown*).
+1. **Daily Actionable Dashboard**
+   - Instant calculation for today's classes: **SAFE TO SKIP**, **BORDERLINE**, or **DO NOT SKIP**.
+   - Shows deterministic projections: *Attend ➔ 67.86% | Skip ➔ 64.29%*.
+   - 1-Tap Attendance logging (*Attended* / *Skipped*) with instant undo support.
+   - Clean, uncluttered layout with retro pixelated icons.
 
-2. **📷 Timetable AI OCR + Verification Screen**
+2. **Timetable Image OCR + Verification Screen**
    - Upload screenshots or photos of your college timetable (PNG, JPG, WEBP).
-   - Vision AI extracts days, time slots, subject codes, faculty, and room numbers.
-   - **Verification Screen (PRD Principle):** Never blindly trust OCR — review, adjust slots, and confirm before saving.
+   - Extracts days, time slots, subject codes, faculty, and room numbers.
+   - **Verification Screen:** Never blindly trust OCR — review, adjust slots, and confirm before saving.
+   - Manual class builder form to add or edit slots anytime.
 
-3. **📊 Subject Attendance Matrix**
+3. **Subject Attendance Matrix**
    - Subject-wise attended & conducted stepper counters `[ - ]` and `[ + ]`.
-   - Real-time circular percentage indicator and recovery streak calculation.
+   - Real-time percentage indicator and recovery streak calculation.
    - Add custom subjects, labs, tutorials, or electives.
 
-4. **⚡ Weekly Bunk Planner & Multi-Skip Sandbox**
-   - Evaluates weekly flexibility: *“You have 2 safe skips available this week.”*
+4. **Weekly Bunk Planner & Multi-Skip Sandbox**
+   - Evaluates weekly flexibility: *You have 2 safe skips available this week (subject-specific).*
    - Interactive multi-class simulation: Select any set of upcoming classes across the week to see the exact cascade penalty.
 
-5. **🔒 100% Client-Side Privacy & Data Vault**
+5. **100% Client-Side Privacy & Data Vault**
    - Zero login, zero database, zero external tracking.
    - All attendance records and timetables are stored in browser `localStorage`.
    - 1-click **Export Backup (.JSON)** and **Import Backup**.
@@ -46,7 +49,7 @@ What students actually need answered is:
 
 ---
 
-## 🧮 The Core Mathematical Engine
+## The Core Mathematical Engine
 
 Unlike apps that use generative AI to guess attendance advice, BunkWise is **strictly deterministic JavaScript algebra**:
 
@@ -62,7 +65,7 @@ $$\text{classesNeeded} = \max\left(0, \left\lceil \frac{T \cdot C - A}{1 - T} \r
 
 ---
 
-## 🎯 Authentic Demo Dataset Included
+## Authentic Demo Dataset Included
 
 Pre-loaded with real university attendance and timetable records:
 - **DSC04 (Coursera Track 4):** 7 / 9 = 77.78% (Safe)
@@ -78,9 +81,9 @@ Pre-loaded with real university attendance and timetable records:
 
 ---
 
-## 🚀 Deploying to Vercel
+## Deploying to Vercel
 
-BunkWise runs as a lightweight, lightning-fast static web app with zero build steps or npm installations:
+BunkWise runs as a lightweight, static web app with zero build steps or npm installations:
 
 1. Push this directory to GitHub.
 2. Import the repository into **Vercel**.
@@ -95,12 +98,7 @@ BunkWise runs as a lightweight, lightning-fast static web app with zero build st
 
 ---
 
-## 💻 Local Usage
+## Local Usage
 
 Simply double-click `index.html` or open it in any web browser.  
-No node, npm, or build tools required!
-
----
-
-## 📜 License
-MIT License. Built for students everywhere with humor, math, and respect for academic survival.
+No node, npm, or build tools required.
