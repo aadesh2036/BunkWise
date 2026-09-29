@@ -17,6 +17,8 @@ const PixelIcon = {
 
     dice: `<svg class="px-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h12v12H2V2zm2 2v2h2V4H4zm6 0v2h2V4h-2zm-3 3v2h2V7H7zm-3 3v2h2v-2H4zm6 0v2h2v-2h-2z"/></svg>`,
 
+    home: `<svg class="px-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l7 6h-2v8H3V7H1l7-6zm3 12V9H5v4h6z"/></svg>`,
+
     dashboard: `<svg class="px-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1 2h6v5H1V2zm8 0h6v3H9V2zm0 5h6v7H9V7zM1 9h6v5H1V9z"/></svg>`,
     
     calendar: `<svg class="px-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M3 1h2v2H3V1zm8 0h2v2h-2V1zM1 3h14v12H1V3zm2 4h3v2H3V7zm5 0h3v2H8V7zm-5 4h3v2H3v-2zm5 0h3v2H8v-2z"/></svg>`,

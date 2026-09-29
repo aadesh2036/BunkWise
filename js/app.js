@@ -3,11 +3,20 @@
  */
 
 const App = {
-  currentTab: "dashboard",
+  currentTab: "landing",
   state: null,
 
   init() {
     this.state = StorageManager.init();
+    
+    // Check if user came via direct navigation or preference
+    const visited = sessionStorage.getItem("bunkwise_visited");
+    if (visited) {
+      this.currentTab = "dashboard";
+    } else {
+      this.currentTab = "landing";
+    }
+
     this.setupNavigation();
     this.renderCurrentView();
   },
@@ -31,10 +40,22 @@ const App = {
   },
 
   navigateTo(tabName) {
+    if (this.currentTab === "landing" && tabName !== "landing" && window.LandingView) {
+      window.LandingView.cleanupPixelCanvas();
+    }
     this.currentTab = tabName;
+    if (tabName !== "landing") {
+      sessionStorage.setItem("bunkwise_visited", "true");
+    }
     this.updateNavUI();
     this.renderCurrentView();
     window.scrollTo({ top: 0, behavior: "smooth" });
+  },
+
+  openTimetableModal() {
+    if (window.TimetableModal) {
+      window.TimetableModal.open();
+    }
   },
 
   updateNavUI() {
@@ -63,6 +84,11 @@ const App = {
     const badgeEl = document.getElementById("header-pulse-badge");
     if (!badgeEl || !this.state) return;
 
+    if (this.currentTab === "landing") {
+      badgeEl.className = "hidden";
+      return;
+    }
+
     const target = this.state.settings.targetAttendance || 75;
     const overall = BunkEngine.calculateOverallStats(this.state.subjects, target);
 
@@ -90,6 +116,9 @@ const App = {
     this.updateHeaderBadge();
 
     switch (this.currentTab) {
+      case "landing":
+        LandingView.render(container);
+        break;
       case "dashboard":
         DashboardView.render(container, this.state);
         break;
@@ -120,7 +149,7 @@ const App = {
     }
   },
 
-  showToast(message, duration = 3000) {
+  showToast(message, duration = 3500) {
     let toast = document.getElementById("global-toast");
     if (!toast) {
       toast = document.createElement("div");
@@ -131,7 +160,7 @@ const App = {
     toast.innerHTML = `
       <div class="flex items-center justify-between gap-3 w-full">
         <div class="flex-1">${message}</div>
-        <button onclick="document.getElementById('global-toast').classList.remove('show')" class="text-xs font-bold hover:text-red-500">✕</button>
+        <button onclick="document.getElementById('global-toast').classList.remove('show')" class="text-xs font-bold hover:text-red-500 p-1">✕</button>
       </div>
     `;
     toast.classList.add("show");

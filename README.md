@@ -20,28 +20,37 @@ AI is kept strictly where it provides genuine value: **reading timetable photos 
 
 ## Clean & Focused Features
 
-1. **Daily Actionable Dashboard**
-   - Instant calculation for today's classes: **SAFE TO SKIP**, **BORDERLINE**, or **DO NOT SKIP**.
-   - Shows deterministic projections: *Attend ➔ 67.86% | Skip ➔ 64.29%*.
-   - 1-Tap Attendance logging (*Attended* / *Skipped*) with instant undo support.
-   - Clean, uncluttered layout with retro pixelated icons.
+1. **Active Decision Queue (Today's Classes)**
+   - Scheduled classes for the day appear in a dynamic tactical queue.
+   - 1-Tap Attendance logging (*"I Showed Up 🫡"* or *"I Slept In 💀"*).
+   - **Queue Removal:** Once marked, the card is immediately cleared from the active queue.
+   - **Multi-Click Lockout:** Anti-debounce logic prevents double-clicks from inflating attendance.
+   - **Undo Drawer:** Revert any logged class back to the active queue with a single tap.
 
-2. **Timetable Image OCR + Verification Screen**
-   - Upload screenshots or photos of your college timetable (PNG, JPG, WEBP).
-   - Extracts days, time slots, subject codes, faculty, and room numbers.
-   - **Verification Screen:** Never blindly trust OCR — review, adjust slots, and confirm before saving.
-   - Manual class builder form to add or edit slots anytime.
+2. **Beautiful Student Landing Page**
+   - Striking neo-brutalist aesthetic with live interactive decision teaser widget.
+   - Explains the 4 core pillars: Deterministic Math, 1-Tap Queue, Weekly Sandbox, Zero Database Privacy.
+   - Quick onboarding pathways: Launch Demo, Upload Timetable, or Blank Canvas.
 
-3. **Subject Attendance Matrix**
-   - Subject-wise attended & conducted stepper counters `[ - ]` and `[ + ]`.
-   - Real-time percentage indicator and recovery streak calculation.
-   - Add custom subjects, labs, tutorials, or electives.
+3. **Timetable Dialogue Box (Upload or Use Demo)**
+   - Zero-database setup modal accessible from any screen:
+     - **⚡ 1-Tap Student Demo:** Instant load of the real AI & Data Science Sem 6 timetable.
+     - **📁 File Upload:** Supports `.json` backups and `.csv` schedules.
+     - **📝 Paste CSV:** Quick-paste schedule rows from Excel or Google Sheets.
+     - **📷 Timetable Photo OCR:** Vision OCR with pre-commit verification review.
+     - **✨ Blank Schedule:** Build custom classes from scratch.
+   - Downloadable sample CSV template included.
 
-4. **Weekly Bunk Planner & Multi-Skip Sandbox**
-   - Evaluates weekly flexibility: *You have 2 safe skips available this week (subject-specific).*
-   - Interactive multi-class simulation: Select any set of upcoming classes across the week to see the exact cascade penalty.
+4. **Mobile-First Responsive Design**
+   - Seamless usability across mobile phones, tablets, and desktops.
+   - Smooth horizontal swipe for day navigation, touch-friendly buttons, and responsive modal dialogues.
 
-5. **100% Client-Side Privacy & Data Vault**
+5. **Deterministic Mathematical Engine & Weekly Planner**
+   - 100% explainable integer algebra (0% AI hallucination).
+   - Computes exact skip allowances and unbroken redemption streaks required for exam cutoff.
+   - Weekly sandbox to simulate multiple future absences before making the decision.
+
+6. **100% Client-Side Privacy & Data Vault**
    - Zero login, zero database, zero external tracking.
    - All attendance records and timetables are stored in browser `localStorage`.
    - 1-click **Export Backup (.JSON)** and **Import Backup**.

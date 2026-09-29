@@ -18,14 +18,18 @@ const TimetableView = {
           <div>
             <h2 class="font-headline text-2xl font-bold text-[#18181B]">Weekly Schedule</h2>
             <p class="text-xs text-slate-500 mt-0.5">
-              Import a photo of your college timetable or add classes manually.
+              Import via Photo OCR, CSV file, custom entry, or preloaded demo.
             </p>
           </div>
 
           <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="App.openTimetableModal()" class="bw-btn text-xs bg-yellow-50 hover:bg-yellow-100">
+              ${PixelIcon.get('upload')}
+              <span>Upload / Switch Timetable</span>
+            </button>
             <button onclick="TimetableView.openOCRModal()" class="bw-btn bw-btn-accent text-xs">
               ${PixelIcon.get('camera')}
-              <span>Import Timetable (Image OCR)</span>
+              <span>Photo OCR</span>
             </button>
             <button onclick="TimetableView.openAddClassModal()" class="bw-btn bw-btn-primary text-xs">
               ${PixelIcon.get('plus')}
@@ -331,6 +335,30 @@ const TimetableView = {
       return;
     }
 
+    // Auto-create any missing subjects in App.state.subjects
+    const subjects = App.state.subjects || [];
+    window.tempExtractedClasses.forEach(item => {
+      const code = (item.subjectCode || "SUB").toUpperCase();
+      let sub = subjects.find(s => s.code.toUpperCase() === code || s.id === item.subjectId);
+      if (!sub) {
+        sub = {
+          id: "sub_" + code.replace(/[^A-Z0-9]/g, "_") + "_" + Date.now(),
+          code: item.subjectCode,
+          name: item.subjectName || item.subjectCode,
+          faculty: item.faculty || "--",
+          type: item.type || "theory",
+          attended: 0,
+          conducted: 0,
+          color: "#0F766E"
+        };
+        subjects.push(sub);
+      }
+      item.subjectId = sub.id;
+    });
+
+    App.state.subjects = subjects;
+    StorageManager.saveSubjects(subjects);
+
     App.state.timetable = window.tempExtractedClasses;
     StorageManager.saveTimetable(window.tempExtractedClasses);
     Modal.close();
@@ -339,10 +367,10 @@ const TimetableView = {
   },
 
   openAddClassModal(defaultDay = "Tuesday") {
-    const subjects = App.state.subjects;
+    const subjects = App.state.subjects || [];
 
     Modal.open(`
-      <div class="p-6 flex flex-col gap-4">
+      <div class="p-4 sm:p-6 flex flex-col gap-4">
         <div class="flex items-center justify-between pb-3 border-b border-slate-200">
           <h3 class="font-headline text-lg font-bold">Add Class to Schedule</h3>
           <button onclick="Modal.close()" class="text-slate-500 hover:text-black">
@@ -351,18 +379,18 @@ const TimetableView = {
         </div>
 
         <form id="add-class-form" onsubmit="TimetableView.saveManualClass(event)" class="flex flex-col gap-3 text-xs">
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="font-bold block mb-1">Day:</label>
+              <label class="font-bold block mb-1">Day of Week:</label>
               <select id="form-day" class="w-full p-2 border border-[#18181B] rounded font-bold">
                 ${DateUtils.DAYS.map(d => `<option value="${d}" ${d === defaultDay ? 'selected' : ''}>${d}</option>`).join("")}
               </select>
             </div>
             <div>
-              <label class="font-bold block mb-1">Type:</label>
+              <label class="font-bold block mb-1">Session Type:</label>
               <select id="form-type" class="w-full p-2 border border-[#18181B] rounded font-bold">
-                <option value="theory">Theory</option>
-                <option value="lab">Lab</option>
+                <option value="theory">Theory Lecture</option>
+                <option value="lab">Practical / Lab</option>
                 <option value="tutorial">Tutorial</option>
               </select>
             </div>
@@ -380,30 +408,54 @@ const TimetableView = {
           </div>
 
           <div>
-            <label class="font-bold block mb-1">Subject:</label>
-            <select id="form-subject" class="w-full p-2 border border-[#18181B] rounded font-bold">
-              ${subjects.map(s => `<option value="${s.id}">${s.code} - ${s.name}</option>`).join("")}
+            <label class="font-bold block mb-1">Select Subject:</label>
+            <select id="form-subject" onchange="TimetableView.handleSubjectSelectChange(this.value)" class="w-full p-2 border border-[#18181B] rounded font-bold">
+              ${subjects.map(s => `<option value="${s.id}">${s.code} — ${s.name}</option>`).join("")}
+              <option value="__NEW__">+ Create New Subject...</option>
             </select>
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
+          <div id="new-subject-fields" class="${subjects.length > 0 ? 'hidden' : ''} p-3 bg-slate-50 border border-slate-300 rounded flex flex-col gap-2">
+            <span class="font-bold text-slate-700">New Subject Details:</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <input type="text" id="form-new-code" placeholder="Subject Code (e.g. CS301)" class="w-full p-2 border border-[#18181B] rounded font-bold uppercase">
+              <input type="text" id="form-new-name" placeholder="Subject Name (e.g. Compiler Design)" class="w-full p-2 border border-[#18181B] rounded font-bold">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="font-bold block mb-1">Room:</label>
+              <label class="font-bold block mb-1">Room / Hall:</label>
               <input type="text" id="form-room" placeholder="e.g. D208" class="w-full p-2 border border-[#18181B] rounded font-bold">
             </div>
             <div>
               <label class="font-bold block mb-1">Faculty:</label>
-              <input type="text" id="form-faculty" placeholder="e.g. Prof. Vance" class="w-full p-2 border border-[#18181B] rounded font-bold">
+              <input type="text" id="form-faculty" placeholder="e.g. Dr. Vance" class="w-full p-2 border border-[#18181B] rounded font-bold">
             </div>
           </div>
 
           <div class="flex justify-end gap-2 pt-3 border-t border-slate-200 mt-2">
             <button type="button" onclick="Modal.close()" class="bw-btn">Cancel</button>
-            <button type="submit" class="bw-btn bw-btn-primary">Add Class</button>
+            <button type="submit" class="bw-btn bw-btn-primary">Save Class</button>
           </div>
         </form>
       </div>
     `);
+
+    if (subjects.length === 0) {
+      const select = document.getElementById("form-subject");
+      if (select) select.value = "__NEW__";
+    }
+  },
+
+  handleSubjectSelectChange(val) {
+    const fields = document.getElementById("new-subject-fields");
+    if (!fields) return;
+    if (val === "__NEW__") {
+      fields.classList.remove("hidden");
+    } else {
+      fields.classList.add("hidden");
+    }
   },
 
   saveManualClass(e) {
@@ -412,12 +464,37 @@ const TimetableView = {
     const type = document.getElementById("form-type").value;
     const start = document.getElementById("form-start").value;
     const end = document.getElementById("form-end").value;
-    const subId = document.getElementById("form-subject").value;
-    const room = document.getElementById("form-room").value || "TBA";
-    const faculty = document.getElementById("form-faculty").value || "Faculty";
+    const subSelect = document.getElementById("form-subject").value;
+    const room = document.getElementById("form-room").value.trim() || "TBA";
+    const faculty = document.getElementById("form-faculty").value.trim() || "Faculty";
 
+    if (start >= end) {
+      App.showToast("Start time must be earlier than End time.");
+      return;
+    }
+
+    let targetSub = null;
     const subjects = App.state.subjects;
-    const targetSub = subjects.find(s => s.id === subId);
+
+    if (subSelect === "__NEW__") {
+      const newCode = (document.getElementById("form-new-code").value.trim() || "SUB" + Date.now().toString().slice(-4)).toUpperCase();
+      const newName = document.getElementById("form-new-name").value.trim() || newCode;
+
+      targetSub = {
+        id: "sub_" + newCode.replace(/[^A-Z0-9]/g, "_") + "_" + Date.now(),
+        code: newCode,
+        name: newName,
+        faculty: faculty,
+        type: type,
+        attended: 0,
+        conducted: 0,
+        color: "#0F766E"
+      };
+      subjects.push(targetSub);
+      StorageManager.saveSubjects(subjects);
+    } else {
+      targetSub = subjects.find(s => s.id === subSelect);
+    }
 
     const newClass = {
       id: "class_" + Date.now(),

@@ -8,25 +8,37 @@ const PlannerView = {
   render(container, state) {
     const { subjects, timetable, settings } = state;
     const target = settings.targetAttendance || 75;
-    const weeklyAnalysis = this.analyzeWeeklyFlexibility(timetable, subjects, target);
+
+    // Purge any stale IDs if timetable classes were deleted or modified
+    const validIds = new Set((timetable || []).map(t => t.id));
+    this.simulatedSkips.forEach(id => {
+      if (!validIds.has(id)) this.simulatedSkips.delete(id);
+    });
+
+    const weeklyAnalysis = this.analyzeWeeklyFlexibility(timetable || [], subjects || [], target);
 
     container.innerHTML = `
-      <div class="flex flex-col gap-5 max-w-5xl mx-auto pb-12">
+      <div class="flex flex-col gap-5 max-w-5xl mx-auto pb-16 px-1 sm:px-0">
         
         <!-- Header -->
-        <div class="bw-card p-5 bg-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="bw-card p-4 sm:p-5 bg-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h2 class="font-headline text-2xl font-bold text-[#18181B]">Weekly Bunk Planner</h2>
             <p class="text-xs text-slate-500 mt-0.5">
-              Check upcoming sessions to simulate skipping and see the projected impact.
+              Check upcoming sessions to simulate skipping and see the projected impact before you make the call.
             </p>
           </div>
 
-          ${this.simulatedSkips.size > 0 ? `
-            <button onclick="PlannerView.resetSim()" class="bw-btn text-xs">
-              Clear Simulation (${this.simulatedSkips.size})
+          <div class="flex items-center gap-2">
+            ${this.simulatedSkips.size > 0 ? `
+              <button onclick="PlannerView.resetSim()" class="bw-btn text-xs">
+                Clear Simulation (${this.simulatedSkips.size})
+              </button>
+            ` : ""}
+            <button onclick="App.openTimetableModal()" class="bw-btn text-xs bg-yellow-50 hover:bg-yellow-100">
+              ${PixelIcon.get('upload')} Timetable
             </button>
-          ` : ""}
+          </div>
         </div>
 
         <!-- Weekly Flexibility Summary Banner -->

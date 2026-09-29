@@ -5,41 +5,63 @@
 
 const BunkEngine = {
   calculatePercentage(attended, conducted) {
-    if (!conducted || conducted <= 0) return 0;
-    return Number(((attended / conducted) * 100).toFixed(2));
+    const a = Number(attended) || 0;
+    const c = Number(conducted) || 0;
+    if (c <= 0 || a <= 0) return 0;
+    const pct = (a / c) * 100;
+    return Number(Math.min(100, Math.max(0, pct)).toFixed(2));
   },
 
   calculateSkipAllowance(attended, conducted, target = 75) {
-    if (!conducted || conducted <= 0) return 0;
-    const targetDecimal = target / 100;
+    const a = Number(attended) || 0;
+    const c = Number(conducted) || 0;
+    const t = Number(target) || 75;
+    if (c <= 0 || a <= 0 || t <= 0) return 0;
     
-    if ((attended / conducted) < targetDecimal) {
+    // Check if currently meeting target
+    if ((a / c) * 100 < t) {
       return 0;
     }
 
-    const allowance = Math.floor((attended / targetDecimal) - conducted);
+    // Exact integer-scaled calculation to prevent floating point precision bugs
+    // Condition: a / (c + allowance) >= t / 100  =>  (a * 100) / t - c >= allowance
+    const allowance = Math.floor(((a * 100) / t) - c + 1e-9);
     return Math.max(0, allowance);
   },
 
   classesNeededToRecover(attended, conducted, target = 75) {
-    if (!conducted || conducted <= 0) return 0;
-    const targetDecimal = target / 100;
+    const a = Number(attended) || 0;
+    const c = Number(conducted) || 0;
+    const t = Number(target) || 75;
+    if (c <= 0 || t <= 0) return 0;
 
-    if ((attended / conducted) >= targetDecimal) {
+    // Check if already meeting target
+    if ((a / c) * 100 >= t) {
       return 0;
     }
 
-    const numerator = (targetDecimal * conducted) - attended;
-    const denominator = 1 - targetDecimal;
-    if (denominator <= 0) return 0;
+    if (t >= 100) {
+      // Mathematically, 100% can never be recovered if any class was missed
+      return Math.max(0, c - a);
+    }
 
-    const needed = Math.ceil(numerator / denominator);
+    // Condition: (a + x) / (c + x) >= t / 100
+    // => 100a + 100x >= t*c + t*x
+    // => x(100 - t) >= t*c - 100a
+    // => x = ceil((t*c - 100a) / (100 - t))
+    const numerator = (t * c) - (100 * a);
+    const denominator = 100 - t;
+    if (denominator <= 0) return Math.max(0, c - a);
+
+    const needed = Math.ceil((numerator - 1e-9) / denominator);
     return Math.max(0, needed);
   },
 
   simulateOutcome(attended, conducted, willAttend) {
-    const newAttended = willAttend ? attended + 1 : attended;
-    const newConducted = conducted + 1;
+    const a = Number(attended) || 0;
+    const c = Number(conducted) || 0;
+    const newAttended = willAttend ? a + 1 : a;
+    const newConducted = c + 1;
     const percentage = this.calculatePercentage(newAttended, newConducted);
     return {
       attended: newAttended,
@@ -138,6 +160,12 @@ const BunkEngine = {
     const skipAllowance = this.calculateSkipAllowance(attended, conducted, target);
     const recoveryNeeded = this.classesNeededToRecover(attended, conducted, target);
 
+    const formatDiff = (val) => {
+      const num = Number(val);
+      if (Math.abs(num) < 0.001) return 0;
+      return Number(num.toFixed(2));
+    };
+
     // Scenario A: Already below requirement
     if (currentPct < target) {
       return {
@@ -151,8 +179,8 @@ const BunkEngine = {
         currentPct,
         attendPct: ifAttend.percentage,
         skipPct: ifSkip.percentage,
-        diffAttend: Number((ifAttend.percentage - currentPct).toFixed(2)),
-        diffSkip: Number((ifSkip.percentage - currentPct).toFixed(2)),
+        diffAttend: formatDiff(ifAttend.percentage - currentPct),
+        diffSkip: formatDiff(ifSkip.percentage - currentPct),
         skipAllowance,
         recoveryNeeded,
         safeToSkip: false
@@ -172,8 +200,8 @@ const BunkEngine = {
         currentPct,
         attendPct: ifAttend.percentage,
         skipPct: ifSkip.percentage,
-        diffAttend: Number((ifAttend.percentage - currentPct).toFixed(2)),
-        diffSkip: Number((ifSkip.percentage - currentPct).toFixed(2)),
+        diffAttend: formatDiff(ifAttend.percentage - currentPct),
+        diffSkip: formatDiff(ifSkip.percentage - currentPct),
         skipAllowance,
         recoveryNeeded,
         safeToSkip: false
@@ -192,8 +220,8 @@ const BunkEngine = {
       currentPct,
       attendPct: ifAttend.percentage,
       skipPct: ifSkip.percentage,
-      diffAttend: Number((ifAttend.percentage - currentPct).toFixed(2)),
-      diffSkip: Number((ifSkip.percentage - currentPct).toFixed(2)),
+      diffAttend: formatDiff(ifAttend.percentage - currentPct),
+      diffSkip: formatDiff(ifSkip.percentage - currentPct),
       skipAllowance,
       recoveryNeeded,
       safeToSkip: true

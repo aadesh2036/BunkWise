@@ -69,9 +69,27 @@ const AttendanceView = {
         </div>
 
         <!-- Subject Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          ${subjects.map((sub, idx) => this.renderSubjectCard(sub, target, idx)).join("")}
-        </div>
+        ${subjects.length === 0 ? `
+          <div class="bw-card p-10 text-center flex flex-col items-center justify-center gap-3 bg-white">
+            <div class="text-slate-400">${PixelIcon.get('cat')}</div>
+            <h3 class="font-headline font-bold text-lg">No Subjects in Matrix</h3>
+            <p class="text-xs text-slate-500 max-w-sm">
+              Your attendance vault is empty. You can add subjects manually, import your timetable, or load the student demo dataset.
+            </p>
+            <div class="flex items-center gap-2 mt-2">
+              <button onclick="AttendanceView.openAddSubjectModal()" class="bw-btn bw-btn-primary text-xs">
+                ${PixelIcon.get('plus')} Add Subject
+              </button>
+              <button onclick="App.openTimetableModal()" class="bw-btn text-xs">
+                ${PixelIcon.get('upload')} Upload / Use Demo
+              </button>
+            </div>
+          </div>
+        ` : `
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            ${subjects.map((sub, idx) => this.renderSubjectCard(sub, target, idx)).join("")}
+          </div>
+        `}
 
       </div>
     `;
@@ -209,8 +227,15 @@ const AttendanceView = {
     const sub = subjects.find(s => s.id === subId);
     if (!sub) return;
 
-    const newAttended = Math.max(0, (Number(sub.attended) || 0) + delta);
-    const newConducted = Math.max(newAttended, Number(sub.conducted) || 0);
+    let currentAttended = Number(sub.attended) || 0;
+    let currentConducted = Number(sub.conducted) || 0;
+
+    let newAttended = Math.max(0, currentAttended + delta);
+    // You cannot attend a lecture that wasn't conducted
+    let newConducted = Math.max(newAttended, currentConducted);
+    if (delta > 0 && newAttended > currentConducted) {
+      newConducted = newAttended;
+    }
 
     sub.attended = newAttended;
     sub.conducted = newConducted;
@@ -225,7 +250,10 @@ const AttendanceView = {
     if (!sub) return;
 
     const currentAttended = Number(sub.attended) || 0;
-    const newConducted = Math.max(currentAttended, (Number(sub.conducted) || 0) + delta);
+    let currentConducted = Number(sub.conducted) || 0;
+
+    // Total conducted cannot drop below total attended
+    let newConducted = Math.max(currentAttended, currentConducted + delta);
 
     sub.conducted = newConducted;
 
@@ -234,28 +262,44 @@ const AttendanceView = {
   },
 
   deleteSubject(subId) {
-    if (!confirm("Delete this subject?")) return;
+    const sub = App.state.subjects.find(s => s.id === subId);
+    if (!sub) return;
+
+    const affectedClasses = (App.state.timetable || []).filter(t => t.subjectId === subId || t.subjectCode === sub.code);
+    const confirmMsg = affectedClasses.length > 0
+      ? `Delete "${sub.name}" (${sub.code})? This will also remove ${affectedClasses.length} class session(s) from your timetable.`
+      : `Delete "${sub.name}" (${sub.code}) from your matrix?`;
+
+    if (!confirm(confirmMsg)) return;
+
     App.state.subjects = App.state.subjects.filter(s => s.id !== subId);
     StorageManager.saveSubjects(App.state.subjects);
-    App.showToast("Subject removed.");
+
+    // Also remove timetable slots tied to this subject to avoid orphaned ghost classes
+    if (affectedClasses.length > 0) {
+      App.state.timetable = App.state.timetable.filter(t => t.subjectId !== subId && t.subjectCode !== sub.code);
+      StorageManager.saveTimetable(App.state.timetable);
+    }
+
+    App.showToast(`Deleted subject ${sub.code}.`);
     App.renderCurrentView();
   },
 
   openAddSubjectModal() {
     Modal.open(`
-      <div class="p-6 flex flex-col gap-4">
+      <div class="p-4 sm:p-6 flex flex-col gap-4">
         <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-          <h3 class="font-headline text-lg font-bold">Add Subject</h3>
+          <h3 class="font-headline text-lg font-bold">Add Subject to Matrix</h3>
           <button onclick="Modal.close()" class="text-slate-500 hover:text-black">
             ${PixelIcon.get('close')}
           </button>
         </div>
 
         <form onsubmit="AttendanceView.saveNewSubject(event)" class="flex flex-col gap-3 text-xs">
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label class="font-bold block mb-1">Subject Code:</label>
-              <input type="text" id="sub-code" placeholder="e.g. CS301" required class="w-full p-2 border border-[#18181B] rounded font-bold">
+              <input type="text" id="sub-code" placeholder="e.g. CS301" required class="w-full p-2 border border-[#18181B] rounded font-bold uppercase">
             </div>
             <div>
               <label class="font-bold block mb-1">Type:</label>
@@ -273,13 +317,13 @@ const AttendanceView = {
           </div>
 
           <div>
-            <label class="font-bold block mb-1">Faculty:</label>
+            <label class="font-bold block mb-1">Faculty (Optional):</label>
             <input type="text" id="sub-faculty" placeholder="e.g. Dr. Vance" class="w-full p-2 border border-[#18181B] rounded font-bold">
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="font-bold block mb-1">Attended:</label>
+              <label class="font-bold block mb-1">Attended Classes:</label>
               <input type="number" id="sub-att" value="0" min="0" required class="w-full p-2 border border-[#18181B] rounded font-bold">
             </div>
             <div>
@@ -299,21 +343,22 @@ const AttendanceView = {
 
   saveNewSubject(e) {
     e.preventDefault();
-    const code = document.getElementById("sub-code").value.trim();
+    const code = document.getElementById("sub-code").value.trim().toUpperCase();
     const name = document.getElementById("sub-name").value.trim();
     const type = document.getElementById("sub-type").value;
     const faculty = document.getElementById("sub-faculty").value.trim() || "--";
-    const attended = parseInt(document.getElementById("sub-att").value, 10) || 0;
-    const conducted = parseInt(document.getElementById("sub-cond").value, 10) || 0;
+    const attended = Math.max(0, parseInt(document.getElementById("sub-att").value, 10) || 0);
+    const conducted = Math.max(attended, parseInt(document.getElementById("sub-cond").value, 10) || 0);
 
     const newSub = {
-      id: "sub_" + Date.now(),
+      id: "sub_" + code.replace(/[^A-Z0-9]/g, "_") + "_" + Date.now(),
       code,
       name,
       type,
       faculty,
       attended,
-      conducted: Math.max(attended, conducted)
+      conducted: Math.max(attended, conducted),
+      color: "#0F766E"
     };
 
     App.state.subjects.push(newSub);

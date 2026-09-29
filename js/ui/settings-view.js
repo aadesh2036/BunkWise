@@ -29,14 +29,14 @@ const SettingsView = {
               <h3 class="font-headline text-base font-bold text-[#18181B]">Attendance Requirement Cutoff</h3>
               <p class="text-xs text-slate-500">Minimum attendance percentage required to sit for semester examinations.</p>
             </div>
-            <span class="font-headline text-2xl font-bold text-slate-800">
+            <span id="settings-target-header-val" class="font-headline text-2xl font-bold text-slate-800">
               ${currentTarget}%
             </span>
           </div>
 
           <!-- Preset Buttons -->
           <div class="flex flex-wrap items-center gap-2">
-            {[60, 65, 70, 75, 80, 85, 90].map(val => `
+            ${[60, 65, 70, 75, 80, 85, 90].map(val => `
               <button 
                 onclick="SettingsView.updateTarget(${val})" 
                 class="px-3 py-1.5 text-xs font-bold rounded border transition-all ${
@@ -57,10 +57,12 @@ const SettingsView = {
               min="50" 
               max="95" 
               value="${currentTarget}" 
-              oninput="SettingsView.updateTarget(parseInt(this.value, 10))" 
+              id="settings-target-slider"
+              oninput="SettingsView.previewTarget(parseInt(this.value, 10))" 
+              onchange="SettingsView.updateTarget(parseInt(this.value, 10))" 
               class="w-full accent-slate-800 cursor-pointer"
             >
-            <span class="text-xs font-bold text-slate-700 w-10 text-right">${currentTarget}%</span>
+            <span id="target-slider-display" class="text-xs font-bold text-slate-700 w-10 text-right">${currentTarget}%</span>
           </div>
         </div>
 
@@ -149,10 +151,18 @@ const SettingsView = {
     `;
   },
 
+  previewTarget(val) {
+    const display = document.getElementById("target-slider-display");
+    if (display) display.innerText = `${val}%`;
+    const headerDisplay = document.querySelector("#settings-target-header-val");
+    if (headerDisplay) headerDisplay.innerText = `${val}%`;
+  },
+
   updateTarget(newVal) {
-    App.state.settings.targetAttendance = newVal;
+    const val = Math.max(50, Math.min(99, newVal));
+    App.state.settings.targetAttendance = val;
     StorageManager.saveSettings(App.state.settings);
-    App.showToast(`Attendance target updated to ${newVal}%.`);
+    App.showToast(`Attendance target updated to ${val}%.`);
     App.renderCurrentView();
   },
 
@@ -173,7 +183,7 @@ const SettingsView = {
   },
 
   clearAllData() {
-    if (!confirm("Are you sure you want to clear all data?")) return;
+    if (!confirm("Are you sure you want to clear all data? This will wipe your subjects and timetable.")) return;
     App.state = StorageManager.clearAll();
     App.showToast("Local data cleared.");
     App.renderCurrentView();
@@ -192,10 +202,11 @@ const SettingsView = {
         App.showToast("Backup imported successfully.");
         App.renderCurrentView();
       } else {
-        alert("Import failed: " + res.error);
+        App.showToast("Import failed: " + res.error);
       }
     };
     reader.readAsText(file);
+    event.target.value = ""; // Reset input so same file can be reselected
   }
 };
 

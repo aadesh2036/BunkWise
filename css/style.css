@@ -333,3 +333,66 @@ i[class^="pa-"], i[class*=" pa-"] {
   display: inline-block;
   image-rendering: pixelated;
 }
+
+/* Hide scrollbars while preserving touch scroll */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Mobile & Small Screen Optimizations */
+@media (max-width: 640px) {
+  body {
+    padding-bottom: 5.5rem;
+  }
+
+  .bw-card {
+    border-radius: var(--radius-md);
+  }
+
+  .modal-overlay {
+    padding: 0.5rem;
+  }
+
+  .modal-box {
+    max-width: 96vw;
+    width: 96vw;
+    max-height: 88vh;
+    border-radius: var(--radius-md);
+    box-shadow: 3px 3px 0px #18181B;
+  }
+
+  #global-toast {
+    left: 10px;
+    right: 10px;
+    bottom: 64px;
+    max-width: calc(100% - 20px);
+    font-size: 0.75rem;
+  }
+
+  .bw-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.7rem;
+  }
+
+  .stepper-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .mobile-nav-btn {
+    padding: 7px 1px;
+    font-size: 9px;
+  }
+
+  .mobile-nav-btn.active {
+    font-weight: 800;
+    color: #064E3B;
+    background-color: #F0FDF4;
+    border-radius: 4px;
+  }
+}
